@@ -1,99 +1,8 @@
 from flask import Flask, jsonify, request, render_template_string
 
+from services.ai_assistant import get_response
+
 app = Flask(__name__)
-
-BUSINESS_KNOWLEDGE = {
-    "products": [
-        {
-            "name": "Blue Dream",
-            "type": "Flower",
-            "category": "Sativa-leaning hybrid",
-            "description": "Demo product for development."
-        },
-        {
-            "name": "OG Kush",
-            "type": "Flower",
-            "category": "Indica-leaning hybrid",
-            "description": "Demo product for development."
-        },
-        {
-            "name": "Citrus Haze",
-            "type": "Flower",
-            "category": "Sativa",
-            "description": "Demo product for development."
-        }
-    ],
-    "inventory": {
-        "Blue Dream": 24,
-        "OG Kush": 8,
-        "Citrus Haze": 3
-    }
-}
-
-
-def assistant_response(message):
-    message = message.lower().strip()
-
-    if any(word in message for word in ["product", "products", "flower", "strain"]):
-        products = BUSINESS_KNOWLEDGE["products"]
-
-        response = "Here are the current demo products:\n\n"
-        for product in products:
-            response += (
-                f"• {product['name']} — {product['type']} — "
-                f"{product['category']}\n"
-            )
-
-        return response
-
-    if any(word in message for word in ["inventory", "stock", "restock"]):
-        inventory = BUSINESS_KNOWLEDGE["inventory"]
-
-        response = "Current demo inventory:\n\n"
-
-        for product, quantity in inventory.items():
-            status = "⚠️ LOW STOCK" if quantity <= 5 else "OK"
-            response += f"• {product}: {quantity} units — {status}\n"
-
-        return response
-
-    if any(word in message for word in ["marketing", "caption", "instagram", "promo"]):
-        return (
-            "Marketing mode activated.\n\n"
-            "I can help create product captions, promotional ideas, "
-            "content calendars, email campaigns, and product descriptions."
-        )
-
-    if any(word in message for word in ["compliance", "legal", "claim"]):
-        return (
-            "Compliance mode activated.\n\n"
-            "I can flag potentially risky marketing language, "
-            "but CannabisAI is not a lawyer and does not provide legal advice."
-        )
-
-    if any(word in message for word in ["business", "sales", "owner", "manager"]):
-        return (
-            "Business mode activated.\n\n"
-            "Ask me about inventory, products, marketing, operations, "
-            "or business performance."
-        )
-
-    if any(word in message for word in ["hello", "hi", "hey"]):
-        return (
-            "What's good 👋 I'm CannabisAI.\n\n"
-            "I can help with products, inventory, marketing, compliance, "
-            "and cannabis business operations."
-        )
-
-    return (
-        "I'm ready to help.\n\n"
-        "Try asking:\n"
-        "• What products do we have?\n"
-        "• What's low in inventory?\n"
-        "• Give me a marketing idea.\n"
-        "• Check this marketing claim.\n"
-        "• What can you help the business with?"
-    )
 
 
 HTML = """
@@ -281,8 +190,8 @@ HTML = """
             <div class="welcome">
                 <h1>What's the move?</h1>
                 <p>
-                    Ask CannabisAI about your products, inventory,
-                    marketing, or business operations.
+                    Your AI business assistant for products,
+                    inventory, marketing, and operations.
                 </p>
             </div>
 
@@ -314,9 +223,11 @@ async function sendMessage() {
     if (!message) return;
 
     await ask(message);
+
     input.value = "";
     input.focus();
 }
+
 
 async function ask(message) {
     const messages = document.getElementById("messages");
@@ -328,25 +239,38 @@ async function ask(message) {
         </div>
     `;
 
-    const response = await fetch("/chat", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({message})
-    });
+    try {
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: message
+            })
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    messages.innerHTML += `
-        <div class="message">
-            <strong>🌿 CannabisAI</strong><br>
-            ${escapeHtml(data.response)}
-        </div>
-    `;
+        messages.innerHTML += `
+            <div class="message">
+                <strong>🌿 CannabisAI</strong><br>
+                ${escapeHtml(data.response)}
+            </div>
+        `;
+
+    } catch (error) {
+        messages.innerHTML += `
+            <div class="message">
+                <strong>⚠️ Error</strong><br>
+                CannabisAI could not process that request.
+            </div>
+        `;
+    }
 
     window.scrollTo(0, document.body.scrollHeight);
 }
+
 
 function escapeHtml(text) {
     const div = document.createElement("div");
@@ -368,10 +292,11 @@ def home():
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json(silent=True) or {}
+
     message = data.get("message", "")
 
     return jsonify({
-        "response": assistant_response(message)
+        "response": get_response(message)
     })
 
 
@@ -384,4 +309,8 @@ def health():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=True
+    )
