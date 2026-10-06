@@ -46,3 +46,51 @@
 
 Turn CannabisAI into a reusable SaaS platform that a legal cannabis
 business can subscribe to and use as an AI operating assistant.
+
+## Phase 3.5 — Privacy-First LeadFinder
+
+- [ ] Privacy/data-minimization policy
+- [ ] Privacy enforcement service
+- [ ] Lead data model
+- [ ] Public community discovery
+- [ ] Public Reddit discovery
+- [ ] Public Telegram discovery
+- [ ] Public web/business discovery
+- [ ] Lead qualification
+- [ ] AI lead-fit scoring
+- [ ] Lead source tracking
+- [ ] Human approval workflow
+- [ ] Outreach draft generator
+- [ ] Lead deletion
+- [ ] Privacy audit/logging
+- [ ] Platform-policy checks
+
+### LeadFinder Rules
+
+LeadFinder must never become an automated spam system.
+Discovery and qualification are automated where appropriate;
+outreach remains human-controlled.
+
+## Phase 3.5 — Privacy-First LeadFinder
+
+- [ ] Privacy/data-minimization policy
+- [ ] Privacy enforcement service
+- [ ] Lead data model
+- [ ] Public community discovery
+- [ ] Public Reddit discovery
+- [ ] Public Telegram discovery
+- [ ] Public web/business discovery
+- [ ] Lead qualification
+- [ ] AI lead-fit scoring
+- [ ] Lead source tracking
+- [ ] Human approval workflow
+- [ ] Outreach draft generator
+- [ ] Lead deletion
+- [ ] Privacy audit/logging
+- [ ] Platform-policy checks
+
+### LeadFinder Rules
+
+LeadFinder must never become an automated spam system.
+Discovery and qualification are automated where appropriate;
+outreach remains human-controlled.
